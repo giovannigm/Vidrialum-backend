@@ -39,7 +39,7 @@
 
     <section class="home">
       <h3 class="sub-title">Contacto</h3>
-      <form class="form">
+      <form id="contact" class="form">
         <div class="field">
           <label for="nombre">Nombre</label>
           <input type="text" id="nombre" placeholder="Nombre" />
@@ -53,24 +53,19 @@
           <input type="email" id="email" placeholder="Email" required />
         </div>
         <div class="field">
-          <label for="asunto">Numero</label>
+          <label for="numero">Numero</label>
           <input
             type="number"
-            id="asunto"
+            id="numero"
             placeholder="Numero de Contacto"
             required
           />
         </div>
         <div class="field">
           <label for="mensaje">Mensaje</label>
-          <textarea
-            name="mensaje"
-            for="mensaje"
-            placeholder="Descripcion..."
-            maxlength="auto"
-          ></textarea>
+          <input id="mensaje" placeholder="Mensaje" required />
         </div>
-        <button>Enviar</button>
+        <button id="enviar">Enviar</button>
       </form>
     </section>
 
@@ -121,5 +116,33 @@
     </footer>
 
     <script src="./assets/scripts/main.js"></script>
+    <script>
+      const nombre = document.querySelector("#nombre").value;
+      const apellidos = document.querySelector("#apellidos").value;
+      const emial = document.querySelector("#email").value;
+      const numero = document.querySelector("#numero").value;
+      const mensaje = document.querySelector("#mensaje").value;
+      const botonEnviar = document.querySelector("#enviar");
+
+      const sendData = () => {
+        fetch("http://localhost:3000/contact", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            name: nombre,
+            lastName: apellidos,
+            email,
+            phone: numero,
+            message: mensaje,
+          }),
+        })
+          .then((response) => console.log(response))
+          .catch((error) => console.log(error));
+      };
+
+      botonEnviar.addEventListener("click", sendData);
+    </script>
   </body>
 </html>
