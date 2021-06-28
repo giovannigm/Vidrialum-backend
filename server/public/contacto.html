@@ -117,25 +117,26 @@
 
     <script src="./assets/scripts/main.js"></script>
     <script>
-      const nombre = document.querySelector("#nombre").value;
-      const apellidos = document.querySelector("#apellidos").value;
-      const emial = document.querySelector("#email").value;
-      const numero = document.querySelector("#numero").value;
-      const mensaje = document.querySelector("#mensaje").value;
       const botonEnviar = document.querySelector("#enviar");
 
       const sendData = () => {
+        const nombre = document.querySelector("#nombre");
+        const apellidos = document.querySelector("#apellidos");
+        const email = document.querySelector("#email");
+        const numero = document.querySelector("#numero");
+        const mensaje = document.querySelector("#mensaje");
+
         fetch("http://localhost:3000/contact", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            name: nombre,
-            lastName: apellidos,
-            email,
-            phone: numero,
-            message: mensaje,
+            name: nombre.value,
+            lastName: apellidos.value,
+            email: email.value,
+            phone: numero.value,
+            message: mensaje.value,
           }),
         })
           .then((response) => console.log(response))
