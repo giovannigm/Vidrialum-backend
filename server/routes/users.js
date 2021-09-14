@@ -1,21 +1,11 @@
-const { Client } = require("pg");
-
 const express = require("express");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 const config = require("../config");
+const db = require("../db");
 
 const router = express.Router();
-
-let userId = 1;
-const users = [
-  {
-    id: 1,
-    username: "53543308",
-    password: "password",
-  },
-];
 
 /**
  * @route POST /users/signup
@@ -25,31 +15,13 @@ const users = [
 router.post("/signup", async (request, response) => {
   const salt = await bcrypt.genSalt(10);
   const password = await bcrypt.hash(request.body.password, salt);
-  const config = {
-    user: "postgres",
-    host: "localhost",
-    password: "Ggm52623648",
-    database: "Vidrialum",
-  };
-  const client = new Client(config);
-  await client.connect();
-  const result = await client.query("INSERT $1::text as message", [
-    "Hola mundo!",
-  ]);
-  console.log(result.rows[0].message);
-  await client.end();
 
-  return respoonse.send(result.rows[0].message);
+  const result = await db.query(
+    "INSERT INTO users(name, password) VALUES ($1, $2)",
+    [request.body.username, password]
+  );
 
-  const newUser = {
-    id: userId++,
-    username: request.body.username,
-    password,
-  };
-
-  users.push(newUser);
-
-  response.status(201).json(newUser);
+  return response.status(201).json("Created successfully");
 });
 
 /**
@@ -58,17 +30,19 @@ router.post("/signup", async (request, response) => {
  * @access Public
  */
 router.post("/login", async (request, response) => {
-  const userFound = users.find(
-    (user) => user.username === request.body.username
-  );
+  const result = await db.query(`SELECT * FROM users WHERE name=$1`, [
+    request.body.username,
+  ]);
 
-  if (!userFound) {
+  const user = result.rows[0];
+
+  if (!user) {
     return response.status(404).json("User not found");
   }
 
   const isValidPassword = await bcrypt.compare(
     request.body.password,
-    userFound.password
+    user.password
   );
 
   if (!isValidPassword) {
@@ -77,12 +51,12 @@ router.post("/login", async (request, response) => {
 
   const userToken = jwt.sign(
     {
-      userFound,
+      user,
     },
     config.TOKEN
   );
 
-  return response.status(200).json({ userFound, userToken });
+  return response.status(200).json({ user, userToken });
 });
 
 module.exports = router;

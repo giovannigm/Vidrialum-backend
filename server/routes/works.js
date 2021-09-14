@@ -85,6 +85,8 @@ router.delete("/:id", verifyToken, (request, response) => {
 
     works = filteredWorks;
 
+    
+
     response.status(200).json(works);
   } else {
     response.status(404).json("Not found");
