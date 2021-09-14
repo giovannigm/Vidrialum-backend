@@ -1,5 +1,6 @@
 const express = require("express");
 const path = require("path");
+const cors = require("cors");
 
 const worksRoutes = require("./routes/works");
 const userRoutes = require("./routes/users");
@@ -10,6 +11,12 @@ const port = 3000;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(
+  cors({
+    origin: "*",
+    credentials: true,
+  })
+);
 
 app.use(express.static(path.join(__dirname, "public")));
 

@@ -23,7 +23,6 @@ let works = [
   {
     id: 1,
     name: "Name",
-    description: "Description",
     image: "/uploads/BTsbZSpnQ2aTkZ9s2giY8w.jpg-1624470923517.png",
   },
 ];
@@ -59,6 +58,8 @@ router.get("/:id", (request, response) => {
  * @access Private
  */
 router.post("/", upload.single("image"), verifyToken, (request, response) => {
+  console.warn({ request: request.body });
+
   const newWork = {
     id: ++workId,
     ...request.body,

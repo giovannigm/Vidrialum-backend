@@ -1,3 +1,5 @@
+const { Client } = require("pg");
+
 const express = require("express");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
@@ -10,8 +12,8 @@ let userId = 1;
 const users = [
   {
     id: 1,
-    username: "User name",
-    password: "encrypted password",
+    username: "53543308",
+    password: "password",
   },
 ];
 
@@ -23,6 +25,21 @@ const users = [
 router.post("/signup", async (request, response) => {
   const salt = await bcrypt.genSalt(10);
   const password = await bcrypt.hash(request.body.password, salt);
+  const config = {
+    user: "postgres",
+    host: "localhost",
+    password: "Ggm52623648",
+    database: "Vidrialum",
+  };
+  const client = new Client(config);
+  await client.connect();
+  const result = await client.query("INSERT $1::text as message", [
+    "Hola mundo!",
+  ]);
+  console.log(result.rows[0].message);
+  await client.end();
+
+  return respoonse.send(result.rows[0].message);
 
   const newUser = {
     id: userId++,
