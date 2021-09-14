@@ -30,7 +30,7 @@ router.post("/signup", async (request, response) => {
  * @access Public
  */
 router.post("/login", async (request, response) => {
-  const result = await db.query(`SELECT * FROM users WHERE name=$1`, [
+  const result = await db.query("SELECT * FROM users WHERE name=$1", [
     request.body.username,
   ]);
 

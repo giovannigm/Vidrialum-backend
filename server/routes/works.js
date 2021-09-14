@@ -2,14 +2,15 @@ const express = require("express");
 const multer = require("multer");
 
 const verifyToken = require("../verifyToken");
+const db = require("../db");
 
 const router = express.Router();
 
-const PUBLIC_PATH = "server/public";
+const PATH = "server";
 
 const storage = multer.diskStorage({
   destination: (request, file, cb) => {
-    cb(null, `${PUBLIC_PATH}/uploads`);
+    cb(null, `${PATH}/uploads`);
   },
   filename: (request, file, cb) => {
     cb(null, `${file.originalname}-${Date.now()}.png`);
@@ -18,22 +19,15 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-let workId = 1;
-let works = [
-  {
-    id: 1,
-    name: "Name",
-    image: "/uploads/BTsbZSpnQ2aTkZ9s2giY8w.jpg-1624470923517.png",
-  },
-];
-
 /**
  * @route GET /works
  * @desc Get all works
  * @access Public
  */
-router.get("/", (request, response) => {
-  response.status(200).json(works);
+router.get("/", async (request, response) => {
+  const result = await db.query("SELECT * FROM works");
+
+  response.status(200).json(result.rows);
 });
 
 /**
@@ -41,9 +35,12 @@ router.get("/", (request, response) => {
  * @desc Get one work by id
  * @access Public
  */
-router.get("/:id", (request, response) => {
+router.get("/:id", async (request, response) => {
   const idParam = parseInt(request.params.id);
-  const workFound = works.find((work) => work.id === idParam);
+
+  const result = await db.query("SELECT * FROM works WHERE id=$1", [idParam]);
+
+  const workFound = result.rows[0];
 
   if (workFound) {
     response.status(200).json(workFound);
@@ -57,40 +54,31 @@ router.get("/:id", (request, response) => {
  * @desc Crete a new work
  * @access Private
  */
-router.post("/", upload.single("image"), verifyToken, (request, response) => {
-  console.warn({ request: request.body });
+router.post(
+  "/",
+  upload.single("image"),
+  verifyToken,
+  async (request, response) => {
+    await db.query("INSERT INTO works(name, image) VALUES ($1, $2)", [
+      request.body.name,
+      request.file.path.slice(PATH.length),
+    ]);
 
-  const newWork = {
-    id: ++workId,
-    ...request.body,
-    image: request.file.path.slice(PUBLIC_PATH.length),
-  };
-
-  works.push(newWork);
-
-  response.status(201).json(newWork);
-});
+    response.status(201).json("Created successfully");
+  }
+);
 
 /**
  * @route DELETE /works/:id
  * @desc Delete a work
  * @access Private
  */
-router.delete("/:id", verifyToken, (request, response) => {
+router.delete("/:id", verifyToken, async (request, response) => {
   const idParam = parseInt(request.params.id);
-  const workIndex = works.findIndex((work) => work.id === idParam);
 
-  if (workIndex !== -1) {
-    const filteredWorks = works.filter((work) => work.id !== idParam);
+  await db.query("DELETE FROM works WHERE id=$1", [idParam]);
 
-    works = filteredWorks;
-
-    
-
-    response.status(200).json(works);
-  } else {
-    response.status(404).json("Not found");
-  }
+  response.status(200).json("Deleted successfully");
 });
 
 /**
@@ -102,21 +90,16 @@ router.patch(
   "/:id",
   upload.single("image"),
   verifyToken,
-  (request, response) => {
+  async (request, response) => {
     const idParam = parseInt(request.params.id);
-    const workIndex = works.findIndex((work) => work.id === idParam);
 
-    if (workIndex !== -1) {
-      works[workIndex] = {
-        ...works[workIndex],
-        ...request.body,
-        image: request.file.path.slice(PUBLIC_PATH.length),
-      };
+    await db.query("UPDATE works SET name=$1, image=$2 WHERE id=$3", [
+      request.body.name,
+      request.file.path.slice(PATH.length),
+      idParam,
+    ]);
 
-      response.status(200).json(works);
-    } else {
-      response.status(404).json("Not found");
-    }
+    response.status(200).json("Updated successfully");
   }
 );
 
