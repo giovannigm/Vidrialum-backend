@@ -13,8 +13,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(
   cors({
-    origin: "*",
-    credentials: true,
+    origin: "http://localhost:3001",
   })
 );
 
@@ -23,6 +22,8 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use("/users", userRoutes);
 app.use("/works", worksRoutes);
 app.use("/contact", contactRoutes);
+
+app.get("/", (request, response) => response.send("VIDRIALUM"));
 
 app.listen(port, () => {
   console.log(`example app listening at http://localhost:${port}`);
