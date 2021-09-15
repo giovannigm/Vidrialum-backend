@@ -27,14 +27,19 @@ Utilizando el administrador de paquetes [npm](https://www.npmjs.com/) para insta
 npm install
 ```
 
-## Usage
+## Uso
 
 Luego de instalar las dependencias y levantar el proyecto con:
 ```
 npm run dev
 ```
-Debes loguearte y enviar el token en cada request. Podras ver los trabajos creados en `/trabajos.html`.
+Debes loguearte y enviar el token en cada request. Podras ver los trabajos creados en `GET /works`.
 
-Para utilizar el formulario de contacto es necesario que agregues en un archivo `.env` las variables `EMAIL`, `PASSWORD` y `TOKEN` (jwt)
+Para utilizar el endpoint de contacto es necesario que agregues en un archivo `.env` las variables `EMAIL`, `PASSWORD` y `TOKEN` (jwt).
+Para utilizar la aplicacion debes agregar a ese archivo `.env` las variables de entorno de la base de datos `DATABASE_USER`, `DATABASE_HOST`, `DATABASE_PASSWORD`,
+`DATABASE_NAME` y `DATABASE_PORT`.
 
-En el repo encontraras la collection de postman con ejemplos de esto.
+En el repo encontraras la collection de postman con ejemplos de esto y el script de la base de datos.
+
+<h1><strong>NOTA</strong></h1>
+Es necesario primero levantar el backend y luego el frontend
